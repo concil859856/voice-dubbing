@@ -29,8 +29,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt ./
+# Install torch + torchaudio from the cu126 index FIRST with exact
+# pins. DeepFilterNet needs torchaudio.backend.common which was
+# removed in torchaudio 2.6+, so we pin to 2.5.1. Then install
+# the rest from PyPI with a constraints file so pip doesn't
+# re-resolve torch from a different index.
 RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+    && pip install --index-url https://download.pytorch.org/whl/cu126 \
+         torch==2.5.1 torchaudio==2.5.1 \
+    && pip freeze | grep -iE '^(torch|torchaudio)' > /tmp/torch-pin.txt \
+    && pip install -r requirements.txt -c /tmp/torch-pin.txt
 
 COPY main.py ./
 
