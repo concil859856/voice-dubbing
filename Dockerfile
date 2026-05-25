@@ -36,7 +36,7 @@ COPY requirements.txt ./
 # re-resolve torch from a different index.
 RUN pip install --upgrade pip \
     && pip install --index-url https://download.pytorch.org/whl/cu126 \
-         torch==2.5.1 torchaudio==2.5.1 \
+         torch==2.6.0 torchaudio==2.6.0 \
     && pip freeze | grep -iE '^(torch|torchaudio)' > /tmp/torch-pin.txt \
     && pip install -r requirements.txt -c /tmp/torch-pin.txt
 
